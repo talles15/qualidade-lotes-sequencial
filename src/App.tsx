@@ -81,7 +81,11 @@ export default function App({ theme, toggleTheme }: AppProps) {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
     } catch (err: any) {
-      setError(err.message || 'Erro ao realizar login');
+      if (err.code === 'auth/unauthorized-domain') {
+        setError('O domínio atual não está autorizado. Configure-o no Firebase console > Authentication > Configurações > Domínios autorizados.');
+      } else {
+        setError(err.message || 'Erro ao realizar login');
+      }
     }
   };
 
