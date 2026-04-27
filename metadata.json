@@ -1,0 +1,6 @@
+{
+  "name": "Qualidade de Sementes",
+  "description": "Visualize a qualidade de sementes (Vigor, Viabilidade e Areia) através de gráficos organizados por cultivar, extraídos de planilhas de envio.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

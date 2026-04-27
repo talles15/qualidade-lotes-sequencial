@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helpers
+    function isSignedIn() { return request.auth != null; }
+    function incoming() { return request.resource.data; }
+
+    // Validation
+    function isValidDatabaseConfig(data) {
+      return data.keys().hasAll(['records', 'updatedAt', 'updatedBy']) &&
+             data.keys().size() == 3 &&
+             data.records is string &&
+             data.updatedAt == request.time &&
+             data.updatedBy == request.auth.uid;
+    }
+
+    // Path rules
+    match /config/database {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidDatabaseConfig(incoming());
+      allow update: if isSignedIn() && isValidDatabaseConfig(incoming());
+    }
+  }
+}

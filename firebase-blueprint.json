@@ -1,0 +1,31 @@
+{
+  "entities": {
+    "DatabaseConfig": {
+      "title": "DatabaseConfig",
+      "description": "Stores the active dataset uploaded by the user.",
+      "type": "object",
+      "properties": {
+        "records": {
+          "type": "string",
+          "description": "Stringified JSON of the spreadsheet records"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "timestamp"
+        },
+        "updatedBy": {
+          "type": "string"
+        }
+      },
+      "required": ["records", "updatedAt", "updatedBy"]
+    }
+  },
+  "firestore": {
+    "/config/database": {
+      "schema": {
+        "$ref": "DatabaseConfig"
+      },
+      "description": "The active database document"
+    }
+  }
+}
