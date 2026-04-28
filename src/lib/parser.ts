@@ -9,6 +9,7 @@ export interface SeedRecord {
   areia: number;
   bags: number;
   empresa: string;
+  EA72: number;
 }
 
 export function parseExcelOrCsv(buffer: ArrayBuffer): SeedRecord[] {
@@ -68,6 +69,17 @@ export function parseExcelOrCsv(buffer: ArrayBuffer): SeedRecord[] {
   let colEmpresa = headerRow.findIndex(h => h.includes('empresa') || h.includes('cliente'));
   if (colEmpresa === -1) colEmpresa = 1; // Coluna B
 
+  // Procurar a coluna exata "ea72_normais_r1"
+  let colEA72 = headerRow.findIndex(h => {
+    const text = String(h).toLowerCase().trim();
+    return text === 'ea72_normais_r1' || text.includes('ea72_normais_r1') || text.includes('ea72_normais_r1 (bl)');
+  });
+
+  // Fallback explicitly to column BL (index 63) se não encontrar a coluna com o nome exato
+  if (colEA72 === -1) {
+    colEA72 = 63; 
+  }
+
   for (let i = headerRowIndex + 1; i < rawData.length; i++) {
     const row = rawData[i];
     if (!row || row.length === 0) continue;
@@ -103,23 +115,27 @@ export function parseExcelOrCsv(buffer: ArrayBuffer): SeedRecord[] {
 
     // safely parse numbers
     const num = (val: any) => {
+      if (val === undefined || val === null || val === '') return null;
       if (typeof val === 'number') return val;
       if (typeof val === 'string') {
         const parsed = parseFloat(val.replace(',', '.'));
-        return isNaN(parsed) ? 0 : parsed;
+        return isNaN(parsed) ? null : parsed;
       }
-      return 0;
+      return null;
     };
+
+    let ea72Raw = num(row[colEA72]);
 
     records.push({
       cultivar,
       lote: loteStr,
       seqProducao,
-      vigor: num(row[colVigor]),
-      viabilidade: num(row[colViab]),
-      areia: num(row[colAreia]),
-      bags: num(row[colBags]),
+      vigor: num(row[colVigor]) || 0,
+      viabilidade: num(row[colViab]) || 0,
+      areia: num(row[colAreia]) || 0,
+      bags: num(row[colBags]) || 0,
       empresa: colEmpresa !== -1 && row[colEmpresa] ? String(row[colEmpresa]).trim() : 'Não informada',
+      EA72: ea72Raw,
     });
   }
 

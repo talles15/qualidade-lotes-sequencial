@@ -283,6 +283,12 @@ export default function App({ theme, toggleTheme }: AppProps) {
               const avgVigor = (cultivarRecords.reduce((acc, curr) => acc + curr.vigor, 0) / lotCount).toFixed(1);
               const avgViab = (cultivarRecords.reduce((acc, curr) => acc + curr.viabilidade, 0) / lotCount).toFixed(1);
               const avgAreia = (cultivarRecords.reduce((acc, curr) => acc + curr.areia, 0) / lotCount).toFixed(1);
+              
+              const validEA72Records = cultivarRecords.filter(r => r.EA72 && r.EA72 > 0);
+              const avgEA72 = validEA72Records.length > 0 
+                ? (validEA72Records.reduce((acc, curr) => acc + curr.EA72, 0) / validEA72Records.length).toFixed(1)
+                : '0.0';
+
               const totalBags = cultivarRecords.reduce((acc, curr) => acc + (curr.bags || 0), 0);
               
               const CustomXAxisTick = ({ x, y, payload }: any) => {
@@ -322,6 +328,10 @@ export default function App({ theme, toggleTheme }: AppProps) {
                       <div className="flex-1 sm:flex-none text-center px-2 sm:px-4 border-r border-slate-200 dark:border-slate-700">
                         <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider">Média Areia</p>
                         <p className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-500 mt-1">{avgAreia}%</p>
+                      </div>
+                      <div className="flex-1 sm:flex-none text-center px-2 sm:px-4 border-r border-slate-200 dark:border-slate-700">
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider">Média EA72</p>
+                        <p className="text-xl sm:text-2xl font-bold text-fuchsia-600 dark:text-fuchsia-400 mt-1">{avgEA72}%</p>
                       </div>
                       <div className="flex-1 sm:flex-none text-center px-2 sm:px-4 border-r border-slate-200 dark:border-slate-700">
                         <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider">BAGS</p>
@@ -395,6 +405,16 @@ export default function App({ theme, toggleTheme }: AppProps) {
                           strokeDasharray="6 6"
                           dot={{ r: 4, strokeWidth: 2, fill: theme === 'dark' ? '#1E293B' : '#000000' }}
                           activeDot={{ r: 6, strokeWidth: 0, fill: '#d97706' }} 
+                        />
+                        <Line 
+                          type="monotone" 
+                          name="EA72" 
+                          dataKey="EA72" 
+                          stroke="#c026d3" 
+                          strokeWidth={2}
+                          connectNulls={true}
+                          dot={{ r: 4, strokeWidth: 2, fill: theme === 'dark' ? '#1E293B' : '#000000' }}
+                          activeDot={{ r: 6, strokeWidth: 0, fill: '#c026d3' }} 
                         />
                       </LineChart>
                     </ResponsiveContainer>
